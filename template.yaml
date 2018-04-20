@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+
+  # Tables
+
+  OrderReceivedTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: OrderReceivedTable
+      AttributeDefinitions:
+        -
+          AttributeName: id
+          AttributeType: S
+      KeySchema:
+        -
+          AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  OrderFulfilledTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: OrderFulfilledTable
+      AttributeDefinitions:
+        -
+          AttributeName: id
+          AttributeType: S
+      KeySchema:
+        -
+          AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+
+  # Lambdas
+
+  OrderReceivingLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: receive-order.post
+      Runtime: nodejs6.10
+      CodeUri: './dist/'
+      Events:
+        GetResource:
+            Type: Api
+            Properties:
+              Path: /order
+              Method: post
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          OUTPUT_TABLE: !Ref OrderReceivedTable
+
+  OrderFulfilmentLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: fulfill-order.trigger
+      Runtime: nodejs6.10
+      CodeUri: './dist/'
+      Events:
+        GetResource:
+            Type: DynamoDB
+            Properties:
+              Stream: !GetAtt OrderReceivedTable.StreamArn
+              StartingPosition: LATEST
+              BatchSize: 1
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          OUTPUT_TABLE: !Ref OrderFulfilledTable
+
+  OrderGettingLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: get-order.get
+      Runtime: nodejs6.10
+      CodeUri: './dist/'
+      Events:
+        GetResource:
+            Type: Api
+            Properties:
+              Path: /order/{id}
+              Method: get
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          INPUT_TABLE: !Ref OrderFulfilledTable
