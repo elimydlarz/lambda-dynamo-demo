@@ -1,14 +1,14 @@
 {
-  "name": "lambda-dynamo-demo",
+  "name": "lambda-dynamo-demo-2",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "lint": "eslint src",
-    "create-bucket": "aws s3api create-bucket --bucket lambda-dynamo-demo --region ap-southeast-2 --create-bucket-configuration LocationConstraint=ap-southeast-2",
+    "create-bucket": "aws s3api create-bucket --bucket lambda-dynamo-demo-2 --region ap-southeast-2 --create-bucket-configuration LocationConstraint=ap-southeast-2",
     "build": "rm -rf dist && babel src -d dist --ignore '**/*.spec.js' && cp package.json dist && yarn install --cwd dist --production --no-lockfile",
-    "package": "aws cloudformation package --template-file template.yaml --s3-bucket lambda-dynamo-demo --output-template-file packaged-template.yaml",
-    "deploy": "aws cloudformation deploy --template-file packaged-template.yaml --stack-name lambda-dynamo-demo --capabilities CAPABILITY_IAM",
+    "package": "aws cloudformation package --template-file template.yaml --s3-bucket lambda-dynamo-demo-2 --output-template-file packaged-template.yaml",
+    "deploy": "aws cloudformation deploy --template-file packaged-template.yaml --stack-name lambda-dynamo-demo-2 --capabilities CAPABILITY_IAM",
     "build-package-deploy": "yarn run build && yarn run package && yarn run deploy"
   },
   "author": "Eli Mydlarz",
