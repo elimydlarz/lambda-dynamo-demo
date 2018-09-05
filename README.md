@@ -2,10 +2,9 @@
 
 This repo demonstrates a simple application of the 'write now, think later' principle.
 
-1. Orders are received by a Lambda via an API Gateway
-2. Received orders are stored as-is in a DynamoDB table
-3. An order fulfilment Lambda is triggered asynchronously, transforms the order on-demand, fulfils the order and stores this change in a separate table
-4. Orders are retrieved by another Lambda via an API Gateway, at which point they are transformed and merged with their changes on-demand
+1. Orders can be received by a Lambda (`receive-order.js`) via an API Gateway and are stored as-is in a DynamoDB table
+3. An order fulfilment Lambda (`fulfil-order.js`) is triggered asynchronously, transforms the order on-demand, fulfils the order and stores this change in a separate order changes DynamoDB table
+4. Orders can be retrieved by another Lambda (`get-order.js`) via an API Gateway and are transformed and merged with their changes on-demand before being returned to consumers
 
 Because orders are transformed on-demand, the transformation logic can be changed at any time without requiring migration of stored data. This makes it easy to adapt your system as your understanding of the domain and upstream systems grows.
 

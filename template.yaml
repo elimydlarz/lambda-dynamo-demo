@@ -64,7 +64,7 @@ Resources:
   OrderFulfilmentLambda:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: fulfill-order.trigger
+      Handler: fulfil-order.trigger
       Runtime: nodejs6.10
       CodeUri: './dist/'
       Events:
