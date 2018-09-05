@@ -1,5 +1,16 @@
 # Lambda Dynamo Demo
 
+This repo demonstrates a simple application of the 'write now, think later' principle.
+
+1. Orders are received by a Lambda via an API Gateway
+2. Received orders are stored as-is in a DynamoDB table
+3. An order fulfilment Lambda is triggered asynchronously, transforms the order on-demand, fulfils the order and stores this change in a separate table
+4. Orders are retrieved by another Lambda via an API Gateway, at which point they are transformed and merged with their changes on-demand
+
+Because orders are transformed on-demand, the transformation logic can be changed at any time without requiring migration of stored data. This makes it easy to adapt your system as your understanding of the domain and upstream systems grows.
+
+Because order changes are stored separately from orders and merged together on-demand, the merge logic can be changed at any time. This makes it easy to reevaluate what changes mean within your system and how they should impact order data.
+
 # Prerequisites
 
 - Node (see .nvmrc)
@@ -17,6 +28,8 @@ yarn
 ```
 
 ## Deployment
+
+I've hard-coded the bucket and stack name `lambda-dynamo-demo-2` into `package.json`. You'll need to replace this with something else before continuing.
 
 Create an S3 bucket for our lambdas to live in. We only need to do this once.
 
