@@ -1,6 +1,8 @@
 import AWS from 'aws-sdk';
 
-const fulfill = ({ id }) => ({ id, fulfilled: true });
+import transformReceivedOrder from './shared/transform-received-order';
+
+const fulfillOrder = ({ id, products }) => ({ id, productsFulfilled: products });
 
 const put = Item =>
   new AWS.DynamoDB.DocumentClient()
@@ -12,7 +14,8 @@ const put = Item =>
 export const trigger = (event, context, callback) =>
   Promise.resolve(event.Records[0].dynamodb.NewImage)
     .then(AWS.DynamoDB.Converter.unmarshall)
-    .then(fulfill)
+    .then(transformReceivedOrder)
+    .then(fulfillOrder)
     .then(put)
     .then(() => callback(null, null))
     .catch(error => callback(error));
