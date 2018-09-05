@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 
-const fulfill = order => ({ ...order, fulfilled: true });
+const fulfill = ({ id }) => ({ id, fulfilled: true });
 
 const put = Item =>
   new AWS.DynamoDB.DocumentClient()

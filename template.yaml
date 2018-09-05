@@ -5,10 +5,10 @@ Resources:
 
   # Tables
 
-  OrderReceivedTable:
+  ReceivedOrdersTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
-      TableName: OrderReceivedTable
+      TableName: ReceivedOrdersTable
       AttributeDefinitions:
         -
           AttributeName: id
@@ -23,10 +23,10 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
 
-  OrderFulfilledTable:
+  OrderChangesTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
-      TableName: OrderFulfilledTable
+      TableName: OrderChangesTable
       AttributeDefinitions:
         -
           AttributeName: id
@@ -59,7 +59,7 @@ Resources:
       Policies: AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          OUTPUT_TABLE: !Ref OrderReceivedTable
+          OUTPUT_TABLE: !Ref ReceivedOrdersTable
 
   OrderFulfilmentLambda:
     Type: 'AWS::Serverless::Function'
@@ -71,13 +71,13 @@ Resources:
         GetResource:
             Type: DynamoDB
             Properties:
-              Stream: !GetAtt OrderReceivedTable.StreamArn
+              Stream: !GetAtt ReceivedOrdersTable.StreamArn
               StartingPosition: LATEST
               BatchSize: 1
       Policies: AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          OUTPUT_TABLE: !Ref OrderFulfilledTable
+          OUTPUT_TABLE: !Ref OrderChangesTable
 
   OrderGettingLambda:
     Type: 'AWS::Serverless::Function'
@@ -94,4 +94,5 @@ Resources:
       Policies: AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          INPUT_TABLE: !Ref OrderFulfilledTable
+          INPUT_TABLE: !Ref ReceivedOrdersTable
+          CHANGES_TABLE: !Ref OrderChangesTable
